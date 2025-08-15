@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef, useMemo, useCallback, use } from "react";
-import { AutoComplete } from "./AutoComplete";
+import { useState, useEffect, useCallback } from "react";
+import { AutoComplete } from "./feature/AutoComplete";
 import { Map, Marker, NavigationControl } from "react-map-gl/maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
 import pin from "@assets/location-pin.png";
+import WeatherDisplay from "./feature/WeatherDisplay";
 
 function App() {
   const myApiKey = import.meta.env.VITE_GEOAPIFY_KEY;
@@ -26,16 +27,15 @@ function App() {
     }
   }, [location]);
 
-
   return (
     <>
       <div className="App">
-        <div className="absolute top-[5%] left-[3%] border-1 rounded-sm bg-amber-50 z-10 w-4/5 md:w-[38%]">
+        <div className="absolute top-[5%] left-[3%] border-1 rounded-sm bg-white z-10 w-4/5 md:w-[38%]">
           <AutoComplete onPlaceSelect={handlePlaceSelect} />
         </div>
         <Map
           {...viewState}
-          onMove={evt => setViewState(evt.viewState)}
+          onMove={(evt) => setViewState(evt.viewState)}
           style={{ width: "100%", height: "100vh" }}
           mapStyle={`https://maps.geoapify.com/v1/styles/osm-liberty/style.json?apiKey=${myApiKey}`}
         >
@@ -53,6 +53,14 @@ function App() {
           )}
         </Map>
       </div>
+      {location?.properties && (
+        <div className="absolute bottom-0 w-full ">
+          <WeatherDisplay
+            latitude={location.properties.lat}
+            longitude={location.properties.lon}
+          />
+        </div>
+      )}
     </>
   );
 }
