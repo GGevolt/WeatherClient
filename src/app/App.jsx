@@ -4,6 +4,7 @@ import { Map, Marker, NavigationControl } from "react-map-gl/maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
 import pin from "@assets/location-pin.png";
 import WeatherDisplay from "./feature/WeatherDisplay";
+import { motion, AnimatePresence } from "framer-motion";
 
 function App() {
   const myApiKey = import.meta.env.VITE_GEOAPIFY_KEY;
@@ -30,7 +31,9 @@ function App() {
   return (
     <>
       <div className="App">
-        <div className="absolute top-[5%] left-[3%] border-1 rounded-sm bg-white z-10 w-4/5 md:w-[38%]">
+        <div
+          className="absolute top-[5%] left-[3%] border-1 rounded-sm bg-white z-10 w-4/5 md:w-[38%] focus-within:scale-[1.02] focus-within:border-lime-600 transition-transform duration-600"
+        >
           <AutoComplete onPlaceSelect={handlePlaceSelect} />
         </div>
         <Map
@@ -53,14 +56,25 @@ function App() {
           )}
         </Map>
       </div>
-      {location?.properties && (
-        <div className="absolute bottom-0 w-full ">
-          <WeatherDisplay
-            latitude={location.properties.lat}
-            longitude={location.properties.lon}
-          />
-        </div>
-      )}
+      <AnimatePresence initial={false}>
+        {location?.properties && (
+          <motion.div
+            className="absolute bottom-2 w-full "
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{
+              duration: 0.8,
+              ease: "easeInOut",
+            }}
+          >
+            <WeatherDisplay
+              latitude={location.properties.lat}
+              longitude={location.properties.lon}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
