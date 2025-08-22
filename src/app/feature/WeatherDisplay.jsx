@@ -28,6 +28,15 @@ const cardVariants = {
       damping: 12,
     },
   },
+  hover: {
+    scale: 1.05,
+    rotate: "1deg",
+    boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
+    borderColor: "#16a34a",
+  },
+  tap: {
+    scale: 0.98,
+  },
 };
 
 const loadingVariants = {
@@ -36,6 +45,27 @@ const loadingVariants = {
     transition: {
       duration: 1,
       repeat: Infinity,
+    },
+  },
+};
+
+const iconVariants = {
+  visible: {
+    x: 0,
+    rotate: 0,
+  },
+  hover: {
+    x: [-2, 2, -2, 2, 0],
+    rotate: [-5, 5, -5, 5, 0],
+    transition: {
+      duration: 0.5,
+    },
+  },
+  tap: {
+    x: [-2, 2, -2, 2, 0],
+    rotate: [-5, 5, -5, 5, 0],
+    transition: {
+      duration: 0.5,
     },
   },
 };
@@ -176,13 +206,9 @@ const WeatherDisplay = ({ latitude, longitude }) => {
             key={index}
             className="bg-white rounded-lg p-4 shadow-md hover:shadow-lg border-1 transition-shadow"
             variants={cardVariants}
-            whileHover={{
-              scale: 1.05,
-              rotate: "1deg",
-              boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
-              borderColor: "#16a34a",
-            }}
-            whileTap={{ scale: 0.98 }}
+            animate="visible"
+            whileHover="hover"
+            whileTap="tap"
             transition={{
               duration: 0.3,
               ease: "easeInOut",
@@ -199,10 +225,12 @@ const WeatherDisplay = ({ latitude, longitude }) => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-lg">{getPodIcon(forecast.sys.pod)}</span>
-                <span className="text-2xl">
+                <motion.span className="text-lg" variants={iconVariants}>
+                  {getPodIcon(forecast.sys.pod)}
+                </motion.span>
+                <motion.span className="text-2xl" variants={iconVariants}>
                   {getWeatherIcon(forecast.weather[0].main)}
-                </span>
+                </motion.span>
               </div>
             </div>
 
