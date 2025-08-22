@@ -1,5 +1,5 @@
 import { useGetWeather } from "@utils/api";
-import { motion, spring, AnimatePresence } from "framer-motion";
+import { motion, spring } from "framer-motion";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -10,7 +10,7 @@ const containerVariants = {
       delayChildren: 0.2,
     },
   },
-}
+};
 
 const cardVariants = {
   hidden: {
@@ -28,7 +28,7 @@ const cardVariants = {
       damping: 12,
     },
   },
-}
+};
 
 const loadingVariants = {
   animate: {
@@ -38,7 +38,7 @@ const loadingVariants = {
       repeat: Infinity,
     },
   },
-}
+};
 
 const WeatherDisplay = ({ latitude, longitude }) => {
   const {
@@ -46,21 +46,24 @@ const WeatherDisplay = ({ latitude, longitude }) => {
     isPending,
     error,
   } = useGetWeather(latitude, longitude);
-  const formatTime = (dateString) => {
-    const date = new Date(dateString);
+
+  const formatTime = (timestamp, timezoneOffset) => {
+    const date = new Date((timestamp + timezoneOffset) * 1000);
     return date.toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
       hour12: true,
+      timeZone: "UTC",
     });
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
+  const formatDate = (timestamp, timezoneOffset) => {
+    const date = new Date((timestamp + timezoneOffset) * 1000);
     return date.toLocaleDateString("en-US", {
       weekday: "short",
       month: "short",
       day: "numeric",
+      timeZone: "UTC",
     });
   };
 
@@ -80,10 +83,10 @@ const WeatherDisplay = ({ latitude, longitude }) => {
 
   if (isPending) {
     return (
-      <div
-        className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg shadow-lg"
-      >
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Weather Predictions</h2>
+      <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg shadow-lg">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+          Weather Predictions
+        </h2>
 
         <div className="flex flex-col items-center justify-center py-12">
           <motion.div
@@ -109,21 +112,24 @@ const WeatherDisplay = ({ latitude, longitude }) => {
           </motion.p>
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
     return (
-      <div
-        className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg shadow-lg text-center flex flex-col"
-      >
+      <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg shadow-lg text-center flex flex-col">
         <motion.div
           className="mb-4 self-center-safe"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
         >
-          <svg className="w-16 h-16 text-red-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-16 h-16 text-red-500 mx-auto"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -146,16 +152,15 @@ const WeatherDisplay = ({ latitude, longitude }) => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
         >
-          We couldn't fetch the weather information. Please check your connection and try again.
+          We couldn't fetch the weather information. Please check your
+          connection and try again.
         </motion.p>
       </div>
-    )
+    );
   }
 
   return (
-    <div
-      className="max-w-4xl !mx-auto !p-6 bg-gradient-to-br from-blue-50 to-indigo-100 border rounded-lg shadow-lg min-h-0 max-h-[60vh] overflow-y-auto"
-    >
+    <div className="max-w-4xl !mx-auto !p-6 bg-gradient-to-br from-blue-50 to-indigo-100 border rounded-lg shadow-lg min-h-0 max-h-[60vh] overflow-y-auto">
       <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
         Weather Predictions
       </h2>
@@ -186,20 +191,32 @@ const WeatherDisplay = ({ latitude, longitude }) => {
           >
             <div className="flex items-center justify-between mb-3">
               <div className="text-sm text-gray-600">
-                <div className="font-semibold">{formatDate(forecast.dt_txt)}</div>
-                <div>{formatTime(forecast.dt_txt)}</div>
+                <div className="font-semibold">
+                  {formatDate(forecast.dt, weatherData.data.city.timezone)}
+                </div>
+                <div>
+                  {formatTime(forecast.dt, weatherData.data.city.timezone)}
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-lg">{getPodIcon(forecast.sys.pod)}</span>
-                <span className="text-2xl">{getWeatherIcon(forecast.weather[0].main)}</span>
+                <span className="text-2xl">
+                  {getWeatherIcon(forecast.weather[0].main)}
+                </span>
               </div>
             </div>
 
             <div className="space-y-2">
               <div className="text-center">
-                <div className="text-3xl font-bold text-gray-800">{Math.round(forecast.main.temp)}°C</div>
-                <div className="text-sm text-gray-600 capitalize">{forecast.weather[0].description}</div>
-                <div className="text-xs text-gray-500">Feels like {Math.round(forecast.main.feels_like)}°C</div>
+                <div className="text-3xl font-bold text-gray-800">
+                  {Math.round(forecast.main.temp)}°C
+                </div>
+                <div className="text-sm text-gray-600 capitalize">
+                  {forecast.weather[0].description}
+                </div>
+                <div className="text-xs text-gray-500">
+                  Feels like {Math.round(forecast.main.feels_like)}°C
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 mt-3">
@@ -233,7 +250,7 @@ const WeatherDisplay = ({ latitude, longitude }) => {
         ))}
       </motion.div>
     </div>
-  )
+  );
 };
 
 export default WeatherDisplay;
